@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
-VERSION="1.0.0"
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+VERSION_FILE="$SCRIPT_DIR/VERSION"
+
+if [[ -f "$VERSION_FILE" ]]; then
+  VERSION="$(cat "$VERSION_FILE")"
+else
+  VERSION="unknown"
+fi
 CONFIG_DIR="$HOME/.var/app/org.vinegarhq.Sober/config/sober"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 BACKUP_DIR="$CONFIG_DIR/backups"
@@ -71,7 +78,7 @@ interactive_update() {
     echo
 
     # online version
-    LATEST=$(curl -fsSL "https://raw.githubusercontent.com/YOURNAME/slingshot-cli/main/VERSION" 2>/dev/null)
+    LATEST=$(curl -fsSL "https://raw.githubusercontent.com/poetaste/slingshot-cli/main/VERSION" 2>/dev/null)
 
     if [[ -z "$LATEST" ]]; then
       echo "Error: Unable to check for updates."
@@ -98,7 +105,7 @@ interactive_update() {
     y | Y)
       echo
       echo "Updating..."
-      curl -fsSL "https://raw.githubusercontent.com/YOURNAME/slingshot-cli/main/slingshot-cli.sh" -o "$0"
+      curl -fsSL "https://raw.githubusercontent.com/poetaste/slingshot-cli/main/slingshot-cli.sh" -o "$0"
       chmod +x "$0"
       echo "Update complete!"
       read -rp "Press Enter to return..."
