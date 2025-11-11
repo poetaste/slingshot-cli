@@ -1830,6 +1830,53 @@ run_server_region_watcher() {
   done
 }
 
+check_for_updates() {
+  echo "Checking for updates..."
+
+  # Get version from VERSION file
+  local latest
+  latest=$(curl -fsSL "https://raw.githubusercontent.com/poetaste/slingshot-cli/main/VERSION" 2>/dev/null)
+
+  if [[ -z "$latest" ]]; then
+    echo "Failed to check updates."
+    sleep 1
+    return
+  fi
+
+  echo "Current version: $VERSION"
+  echo "Latest version:  $latest"
+  echo
+
+  if [[ "$latest" == "$VERSION" ]]; then
+    echo "You are up to date!"
+    sleep 1
+    return
+  fi
+
+  echo "Update available!"
+  read -rp "Do you want to update to $latest? (y/N): " choice
+
+  case "$choice" in
+  y | Y)
+    echo "Updating..."
+    if curl -fsSL "https://raw.githubusercontent.com/poetaste/slingshot-cli/main/slingshot-cli.sh" -o "$0.new"; then
+      chmod +x "$0.new"
+      mv "$0.new" "$0"
+      echo "Updated to $latest!"
+      echo "Restart the script."
+      exit 0
+    else
+      echo "Update failed."
+      rm -f "$0.new"
+    fi
+    ;;
+  *)
+    echo "Update canceled."
+    sleep 1
+    ;;
+  esac
+}
+
 check_dependencies() {
   local missing=()
   local deps=(jq curl notify-send convert)
